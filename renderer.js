@@ -338,74 +338,183 @@ function updateNodeColor(colorHex, alpha) {
 }
 
 // Before any state-changing action (e.g., adding, moving, resizing nodes or connections), call saveState().
-function saveState() {
-    if (undoStack.length >= MAX_HISTORY) {
-        undoStack.shift(); // Remove oldest state
-    }
-    undoStack.push(JSON.stringify({ nodes, connections, offsetX, offsetY, scale }));
-    // Clear redo stack on new action
-    redoStack = [];
-}
+// function saveState() {
+//     if (undoStack.length >= MAX_HISTORY) {
+//         undoStack.shift(); // Remove oldest state
+//     }
+//     undoStack.push(JSON.stringify({ nodes, connections, offsetX, offsetY, scale, settings }));
+//     // Clear redo stack on new action
+//     redoStack = [];
+// }
 
-function undo() {
-    if (undoStack.length === 0) return;
-    const currentState = JSON.stringify({ nodes, connections, offsetX, offsetY, scale });
-    redoStack.push(currentState);
-    const prevState = JSON.parse(undoStack.pop());
-    restoreState(prevState);
-}
+// function undo() {
+//     if (undoStack.length === 0) return;
+//     const currentState = JSON.stringify({ nodes, connections, offsetX, offsetY, scale });
+//     redoStack.push(currentState);
+//     const prevState = JSON.parse(undoStack.pop());
+//     restoreState(prevState);
+// }
 
-function redo() {
-    if (redoStack.length === 0) return;
-    const currentState = JSON.stringify({ nodes, connections, offsetX, offsetY, scale });
-    undoStack.push(currentState);
-    const nextState = JSON.parse(redoStack.pop());
-    restoreState(nextState);
-}
+// function redo() {
+//     if (redoStack.length === 0) return;
+//     const currentState = JSON.stringify({ nodes, connections, offsetX, offsetY, scale });
+//     undoStack.push(currentState);
+//     const nextState = JSON.parse(redoStack.pop());
+//     restoreState(nextState);
+// }
 
 // function restoreState(state) {
-//     nodes = state.nodes;
-//     connections = state.connections;
-//     offsetX = state.offsetX;
-//     offsetY = state.offsetY;
-//     scale = state.scale;
+//     nodes = state.nodes || [];
+//     connections = state.connections || [];
+//     offsetX = state.offsetX || 0;
+//     offsetY = state.offsetY || 0;
+//     scale = state.scale || 1;
+//     settings = state.settings || { connectionRouting: 'bezier' };
+
+//     // Validate nodes
+//     nodes.forEach(node => {
+//         if (node.type === 'image') {
+//             if (typeof node.width !== 'number' || typeof node.height !== 'number' || node.width <= 0 || node.height <= 0) {
+//                 console.error(`Node ID: ${node.id} has invalid width or height. Setting to default values.`);
+//                 node.width = node.defaultWidth || 100;
+//                 node.height = node.defaultHeight || 100;
+//             } else {
+//                 console.log(`Loaded image node ID: ${node.id}, Width: ${node.width}, Height: ${node.height}`);
+//             }
+//         }
+//     });
+
+//     // Preload image cache
+//     nodes.forEach(node => {
+//         if (node.type === 'image' && node.imageData) {
+//             const img = new Image();
+//             img.src = `data:image/png;base64,${node.imageData}`;
+//             imageCache[node.id] = img;
+//             console.log(`Preloaded image for node ID: ${node.id}`);
+//         }
+//     });
+
+//     applySettings();
 //     drawMap();
 // }
-function restoreState(state) {
-    nodes = state.nodes || [];
-    connections = state.connections || [];
-    offsetX = state.offsetX || 0;
-    offsetY = state.offsetY || 0;
-    scale = state.scale || 1;
-    settings = state.settings || { connectionRouting: 'bezier' };
 
-    // Validate nodes
-    nodes.forEach(node => {
-        if (node.type === 'image') {
-            if (typeof node.width !== 'number' || typeof node.height !== 'number' || node.width <= 0 || node.height <= 0) {
-                console.error(`Node ID: ${node.id} has invalid width or height. Setting to default values.`);
-                node.width = node.defaultWidth || 100;
-                node.height = node.defaultHeight || 100;
-            } else {
-                console.log(`Loaded image node ID: ${node.id}, Width: ${node.width}, Height: ${node.height}`);
-            }
-        }
-    });
+let appState = {
+    nodes: [],
+    connections: [],
+    offsetX: 0,
+    offsetY: 0,
+    scale: 1,
+    settings: {
+        connectionRouting: 'bezier',
+        gridSize: 50,
+        backgroundColor: '#ffffff',
+        gridLineColor: '#e0e0e0',
+        postItColor: 'rgba(255, 255, 0, 1)',
+        connectionLineColor: '#000000'
+    },
+    selectedNodes: [],
+    selectedConnections: [],
+};
 
-    // Preload image cache
-    nodes.forEach(node => {
-        if (node.type === 'image' && node.imageData) {
-            const img = new Image();
-            img.src = `data:image/png;base64,${node.imageData}`;
-            imageCache[node.id] = img;
-            console.log(`Preloaded image for node ID: ${node.id}`);
-        }
-    });
+// Save the current state
+function saveState() {
+    const currentState = JSON.stringify(appState);
 
-    applySettings();
+    // Avoid saving duplicate states
+    if (undoStack.length > 0 && undoStack[undoStack.length - 1] === currentState) {
+        return;
+    }
+
+    if (undoStack.length >= MAX_HISTORY) {
+        undoStack.shift(); // Remove the oldest state
+    }
+    undoStack.push(currentState);
+
+    // Clear redo stack on a new action
+    redoStack = [];
+    console.log('State saved.');
+}
+function undo() {
+    if (undoStack.length === 0) {
+        console.warn('No more actions to undo.');
+        return;
+    }
+
+    const currentState = JSON.stringify(appState);
+    redoStack.push(currentState);
+
+    const prevState = undoStack.pop();
+    restoreState(prevState);
+
+    console.log('Undo completed.');
+
+    // Ensure canvas is redrawn
     drawMap();
 }
 
+function redo() {
+    if (redoStack.length === 0) {
+        console.warn('No more actions to redo.');
+        return;
+    }
+
+    const currentState = JSON.stringify(appState);
+    undoStack.push(currentState);
+
+    const nextState = redoStack.pop();
+    restoreState(nextState);
+
+    console.log('Redo completed.');
+
+    // Ensure canvas is redrawn
+    drawMap();
+}
+
+function restoreState(state) {
+    try {
+        const parsedState = JSON.parse(state);
+        appState = { ...appState, ...parsedState };
+
+        // Reassign state variables
+        ({ nodes, connections, offsetX, offsetY, scale, settings, selectedNodes, selectedConnections } = appState);
+
+        // Rebuild image cache for image nodes
+        imageCache = {};
+        nodes.forEach(node => {
+            if (node.type === 'image' && node.imageData) {
+                const img = new Image();
+                img.src = `data:image/png;base64,${node.imageData}`;
+                imageCache[node.id] = img;
+            }
+        });
+
+        // Redraw the map with restored state
+        applySettings();
+        drawMap();
+
+        console.log('State restored successfully.');
+    } catch (error) {
+        console.error('Failed to restore state:', error);
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (appState.selectedNodes.length > 0 || appState.selectedConnections.length > 0) {
+            saveState(); // Save state before deletion
+
+            appState.selectedNodes.forEach(node => {
+                appState.connections = appState.connections.filter(c => c.source !== node.id && c.target !== node.id);
+                appState.nodes = appState.nodes.filter(n => n !== node);
+            });
+            appState.selectedConnections = [];
+            appState.selectedNodes = [];
+
+            drawMap();
+            e.preventDefault();
+        }
+    }
+});
 
 document.addEventListener('keydown', handleKeyDown);
 function handleKeyDown(e) {
@@ -469,6 +578,7 @@ function handleKeyDown(e) {
                 // Remove the node itself
                 nodes = nodes.filter(n => n !== node);
                 console.log(`Removed node ID: ${node.id}`);
+                saveState();
             });
             selectedNodes = [];
             drawMap();
@@ -1178,6 +1288,7 @@ function handlePointerUp(e) {
     if (isResizing) {
         isResizing = false;
         dragTarget = null;
+        saveState(); // Add this to save the new size
         drawMap();
     }
 
@@ -1215,6 +1326,7 @@ function handlePointerUp(e) {
                 sourceEdge: connectionStart.circle.edge,
                 targetEdge: targetCircle.edge,
             });
+            saveState(); 
             console.log(`Connected node ID: ${connectionStart.node.id} (${connectionStart.circle.edge} edge) to node ID: ${targetNode.id} (${targetCircle.edge} edge)`);
         } else {
             console.log('Connection not established: No valid target circle found.');
@@ -1357,6 +1469,7 @@ document.addEventListener('paste', async (event) => {
     const items = (event.clipboardData || event.originalEvent.clipboardData).items;
     for (const item of items) {
         if (item.type.indexOf('image') === 0) {
+            saveState(); // Save state before adding an image
             const blob = item.getAsFile();
             if (blob) {
                 const reader = new FileReader();
@@ -1437,6 +1550,7 @@ canvas.addEventListener('drop', async (event) => {
 
                     console.log(`Dropped image node ID: ${newNode.id}, Width: ${newNode.width}, Height: ${newNode.height}`);
 
+                    saveState();
                     // Validate width and height
                     if (typeof newNode.width !== 'number' || typeof newNode.height !== 'number' || newNode.width <= 0 || newNode.height <= 0) {
                         console.error(`Invalid dimensions for image node ID: ${newNode.id}. Setting to default values.`);
@@ -1512,6 +1626,7 @@ canvas.addEventListener('dblclick', (e) => {
     const { x, y } = getMousePosition(e);
     const target = findNodeAtPosition(x, y);
     if (target) {
+        saveState() // save state before editing
         // Removed console log
         target.isEditing = true;
         drawMap();
@@ -1577,6 +1692,7 @@ function createEditableInput(node) {
         // Save the input value to the node's content
         node.content = input.value.trim() || 'Click to edit';
         node.isEditing = false;
+        saveState(); // save state after editing loses focus
         
         // Remove the input element
         document.body.removeChild(input);

@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const fs = require('fs');
@@ -31,7 +31,7 @@ function createMainWindow() {
     mainWindow.loadFile('index.html');
 
     // Remove the default menu for a cleaner UI
-    // Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(null);
 }
 
 // Function to create the settings window
