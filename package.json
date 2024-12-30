@@ -1,0 +1,79 @@
+{
+  "name": "MindNoodle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.mindnoodle.mindmap", 
+    "productName": "MindNoodle",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "index.html",
+      "settings.html",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "fileAssociations": [
+        {
+          "ext": "mindmap",
+          "name": "Mind Map File",
+          "description": "Mind Map File",
+          "icon": "assets/icons/mindmap-icon.ico"
+        }
+      ],
+      "icon": "assets/icons/mindmap-icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "fileAssociations": [
+        {
+          "ext": "mindmap",
+          "name": "Mind Map File",
+          "role": "Editor",
+          "icon": "assets/icons/mindmap-icon.icns"
+        }
+      ],
+      "icon": "assets/icons/mindmap-icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "fileAssociations": [
+        {
+          "ext": "mindmap",
+          "mimeType": "application/x-mindmap",
+          "name": "Mind Map File",
+          "description": "Mind Map File",
+          "icon": "assets/icons/mindmap-icon.png"
+        }
+      ],
+      "icon": "assets/icons/mindmap-icon.png"
+    }
+  },
+  "keywords": [],
+  "author": "Anping",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "@simonwep/pickr": "^1.9.1",
+    "adm-zip": "^0.5.16",
+    "electron-store": "^7.0.3",
+    "uuid": "^11.0.3"
+  }
+}

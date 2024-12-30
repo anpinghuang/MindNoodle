@@ -1,0 +1,346 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .routing-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .routing-container input {
+            margin-right: 5px;
+        }
+        /* Slider Styles */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .slider-container input[type="range"] {
+            width: 100%;
+            margin-right: 10px;
+        }
+        .slider-value {
+            width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Theme Selection Styles */
+        .theme-container {
+            margin-bottom: 20px;
+        }
+        /* Update Button Styles */
+        #update-settings {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        #update-settings:disabled {
+            background-color: #a5d6a7;
+            cursor: not-allowed;
+        }
+        .pickr button {
+            border: 1px solid black;
+        }
+    </style>
+    <!-- Include Pickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/> <!-- 'classic' theme -->
+</head>
+<body>
+    <h2>Settings</h2>
+    
+    <!-- Connection Routing Options -->
+    <div class="section">
+        <label>Connection Routing:</label>
+        <div class="routing-container">
+            <input type="radio" id="routing-none" name="connectionRouting" value="none">
+            <label for="routing-none">None</label>
+            <input type="radio" id="routing-orthogonal" name="connectionRouting" value="orthogonal">
+            <label for="routing-orthogonal">Orthogonal</label>
+            <input type="radio" id="routing-bezier" name="connectionRouting" value="bezier">
+            <label for="routing-bezier">Bezier</label>
+        </div>
+    </div>
+
+    <!-- Pre-Made Themes Selection -->
+    <div class="section theme-container">
+        <label for="theme-select">Pre-Made Themes:</label>
+        <select id="theme-select">
+            <option value="">-- Select a Theme --</option>
+            <!-- Themes will be populated dynamically -->
+        </select>
+    </div>
+
+    <!-- Grid Size Slider -->
+    <div class="section">
+        <label for="grid-size">Grid Size (px):</label>
+        <div class="slider-container">
+            <input type="range" id="grid-size" name="grid-size" min="5" max="50" step="5" list="tickmarks">
+            <datalist id="tickmarks">
+                <option value="5"></option>
+                <option value="10"></option>
+                <option value="50"></option>
+            </datalist>
+            <span class="slider-value" id="grid-size-value">50</span>
+        </div>
+    </div>
+
+    <!-- Background Color Picker -->
+    <div class="section">
+        <label for="background-color">Background Color:</label>
+        <div id="background-color-picker"></div>
+    </div>
+
+    <!-- Update Settings Button -->
+    <button id="update-settings" disabled>Update Settings</button>
+
+    <!-- Include Pickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script>
+
+        // Define pre-made themes
+        const themes = [
+            {
+                name: 'Default',
+                gridLineColor: '#e0e0e0',
+                postItColor: 'rgba(255, 255, 0, 1)', // Yellow
+                connectionLineColor: '#000000', // Black
+                backgroundColor: '#ffffff' // White
+            },
+            {
+                name: 'Dark Mode',
+                gridLineColor: '#555555',
+                postItColor: 'rgba(0, 128, 128, 1)', // Teal
+                connectionLineColor: '#ffffff', // White
+                backgroundColor: '#2e2e2e' // Dark Gray
+            },
+            {
+                name: 'Ocean Blue',
+                gridLineColor: '#a0c4ff',
+                postItColor: 'rgba(173, 216, 230, 1)', // Light Blue
+                connectionLineColor: '#1e90ff', // Dodger Blue
+                backgroundColor: '#f0f8ff' // Alice Blue
+            },
+            {
+                name: 'Sunset',
+                gridLineColor: '#ffb3ba',
+                postItColor: 'rgba(255, 99, 71, 1)', // Tomato
+                connectionLineColor: '#ff6347', // Tomato
+                backgroundColor: '#ffe4e1' // Misty Rose
+            },
+            {
+                name: 'Forest',
+                gridLineColor: '#98fb98',
+                postItColor: 'rgba(34, 139, 34, 1)', // Forest Green
+                connectionLineColor: '#228b22', // Forest Green
+                backgroundColor: '#f5fffa' // Mint Cream
+            }
+        ];
+
+        // Current settings state
+        let currentSettings = {
+            connectionRouting: 'bezier',
+            gridSize: 50,
+            backgroundColor: '#ffffff',
+            gridLineColor: '#e0e0e0',          // Default grid line color
+            postItColor: 'rgba(255, 255, 0, 1)', // Default post-it color
+            connectionLineColor: '#000000'     // Default connection line color
+        };
+
+        // Track changes
+        let isChanged = false;
+
+        // Elements
+        const routingRadios = document.querySelectorAll('input[name="connectionRouting"]');
+        const gridSizeSlider = document.getElementById('grid-size');
+        const gridSizeValue = document.getElementById('grid-size-value');
+        const updateButton = document.getElementById('update-settings');
+        const themeSelect = document.getElementById('theme-select');
+
+        // Populate Themes Dropdown
+        themes.forEach((theme, index) => {
+            const option = document.createElement('option');
+            option.value = index; // Use index as value to reference the theme
+            option.textContent = theme.name;
+            themeSelect.appendChild(option);
+        });
+
+        // Initialize Pickr
+        const pickr = Pickr.create({
+            el: '#background-color-picker',
+            theme: 'classic', // or 'monolith', or 'nano'
+            default: currentSettings.backgroundColor,
+            swatches: [
+                '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
+                '#ffff00', '#ff00ff', '#00ffff', '#cccccc', '#ffcccc'
+            ],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        // Handle Pickr color changes
+        pickr.on('change', (color, instance) => {
+            const selectedColor = color.toHEXA().toString(); // Use HEXA for consistency
+            if (selectedColor !== currentSettings.backgroundColor) {
+                isChanged = true;
+                updateButton.disabled = false;
+            }
+        });
+
+        // Handle Pickr save event to close the picker
+        pickr.on('save', (color, instance) => {
+            const selectedColor = color.toHEXA().toString();
+            // Update the background color input value if needed
+            if (selectedColor !== currentSettings.backgroundColor) {
+                isChanged = true;
+                updateButton.disabled = false;
+            }
+            pickr.hide(); // Automatically close the Pickr popup
+        });
+
+        // Handle Connection Routing changes
+        routingRadios.forEach((radio) => {
+            radio.addEventListener('change', (event) => {
+                if (event.target.checked && event.target.value !== currentSettings.connectionRouting) {
+                    isChanged = true;
+                    updateButton.disabled = false;
+                }
+            });
+        });
+
+        // Handle Grid Size slider changes
+        gridSizeSlider.addEventListener('input', (event) => {
+            const validValues = [5, 10, 50];
+            let closestValue = validValues.reduce((prev, curr) => 
+            Math.abs(curr - gridSizeSlider.value) < Math.abs(prev - gridSizeSlider.value) ? curr : prev
+            );
+            gridSizeSlider.value = closestValue;
+            gridSizeValue.textContent = closestValue;
+
+            const newValue = parseInt(event.target.value, 10);
+            gridSizeValue.textContent = newValue;
+            if (newValue !== currentSettings.gridSize) {
+                isChanged = true;
+                updateButton.disabled = false;
+            }
+        });
+
+        // Handle Theme Selection changes
+        themeSelect.addEventListener('change', (event) => {
+            const selectedIndex = event.target.value;
+            if (selectedIndex === "") {
+                // Reset to default settings or keep current settings
+                // Here, we'll do nothing
+                return;
+            }
+            const selectedTheme = themes[selectedIndex];
+            if (selectedTheme) {
+                // Update current settings with the selected theme's settings
+                currentSettings.gridLineColor = selectedTheme.gridLineColor;
+                currentSettings.postItColor = selectedTheme.postItColor;
+                currentSettings.connectionLineColor = selectedTheme.connectionLineColor;
+                currentSettings.backgroundColor = selectedTheme.backgroundColor;
+
+                // Update UI elements to reflect the theme's settings
+                // Update Pickr color
+                pickr.setColor(selectedTheme.backgroundColor);
+
+                // If you have additional color pickers for gridLineColor and connectionLineColor,
+                // you should initialize and update them similarly. For brevity, assuming they are not
+                // present in the current settings page.
+
+                // Optionally, you can update other UI elements or inputs if they exist
+
+                // Mark as changed
+                isChanged = true;
+                updateButton.disabled = false;
+            }
+        });
+
+        // Listen for 'settings-changed' to update the inputs
+        electronAPI.onSettingsChanged((newSettings) => {
+            currentSettings = { ...currentSettings, ...newSettings };
+
+            // Update Connection Routing Radio Buttons
+            if (newSettings.connectionRouting) {
+                const selectedRadio = document.querySelector(`input[name="connectionRouting"][value="${newSettings.connectionRouting}"]`);
+                if (selectedRadio) selectedRadio.checked = true;
+            }
+
+            // Update Grid Size Slider and Display
+            if (newSettings.gridSize) {
+                gridSizeSlider.value = newSettings.gridSize;
+                gridSizeValue.textContent = newSettings.gridSize;
+            }
+
+            // Update Pickr Color
+            if (newSettings.backgroundColor) {
+                pickr.setColor(newSettings.backgroundColor);
+            }
+
+            // Reset change tracking
+            isChanged = false;
+            updateButton.disabled = true;
+        });
+
+        // Request current settings when the settings window loads
+        window.onload = () => {
+            electronAPI.requestSettings();
+        };
+
+        // Handle Update Settings button click
+        updateButton.addEventListener('click', () => {
+            // Gather updated settings
+            const updatedSettings = {
+                connectionRouting: document.querySelector('input[name="connectionRouting"]:checked').value,
+                gridSize: parseInt(gridSizeSlider.value, 10),
+                backgroundColor: pickr.getColor().toHEXA().toString(),
+                gridLineColor: currentSettings.gridLineColor,
+                postItColor: currentSettings.postItColor,
+                connectionLineColor: currentSettings.connectionLineColor
+            };
+
+            // Send updated settings via IPC
+            electronAPI.updateSettings(updatedSettings);
+
+            // Update current settings state
+            currentSettings = { ...currentSettings, ...updatedSettings };
+
+            // Reset change tracking
+            isChanged = false;
+            updateButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

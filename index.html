@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mindmap Application</title>
+    <style>
+        /* Loading Indicator Styles */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+        }
+
+        .spinner {
+            border: 12px solid #f3f3f3; /* Light grey */
+            border-top: 12px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Toolbar Styles */
+        #toolbar {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Color Display */
+        #colorDisplay {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #000;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        /* Pickr Button */
+        #pickr-button {
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        /* Style the other buttons */
+        #toolbar button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        /* Ensure the canvas covers the full window */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #mindmap {
+            display: block;
+            background-color: #f9f9f9; /* Optional: Canvas background color */
+        }
+
+        
+    </style>
+    <!-- Include Pickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/> <!-- 'classic' theme -->
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+
+    <div id="toolbar">
+        <!-- <div id="colorDisplay" title="Selected Node Color"></div> -->
+        <!-- Pickr Button -->
+        <button id="pickr-button">Pick Color</button>
+        <!-- Other Action Buttons -->
+        <button id="undo">Undo</button>
+        <button id="redo">Redo</button>
+        <button id="save-map">Save</button>
+        <button id="load-map">Load</button>
+        <button id="add-post-it">Add Post-It</button>
+        <button id="settingsBtn">Settings</button>
+    </div>
+    <canvas id="mindmap" tabindex="0"></canvas>
+
+
+    <!-- settings button -->
+    <script>
+        // Use the exposed electronAPI from the preload script
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+          window.electronAPI.openSettings();
+        });
+      </script>
+      
+    <!-- Include Pickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <!-- Include TinyColor JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js"></script>
+    <!-- Include Renderer Script -->
+    <script src="renderer.js"></script>
+    
+</body>
+</html>
