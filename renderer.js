@@ -1324,7 +1324,7 @@ document.getElementById('add-post-it').addEventListener('click', () => {
         defaultWidth: 150, // Minimum width
         defaultHeight: 100, // Minimum height
         isEditing: false,
-        color: 'rgb(255, 255, 0)',
+        color: settings.postItColor,
         createdAt: Date.now() // Timestamp
     };
     nodes.push(newNode);
