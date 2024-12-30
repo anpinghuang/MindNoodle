@@ -74,16 +74,14 @@ Before installing the Mindmap Application, ensure that your system meets the fol
     Open your terminal or command prompt and execute:
 
     ```
-    git clone https://github.com/your-username/mindmap-app.git
+    git clone https://github.com/anpinghuang/MindNoodle.git
 
     ```
-
-    Replace `your-username` with the actual GitHub username if applicable.
 
 2.  **Navigate to the Project Directory:**
 
     ```
-    cd mindmap-app
+    cd MindNoodle
 
     ```
 
@@ -475,8 +473,8 @@ Contributions are welcome! Follow these guidelines to contribute to the Mindmap 
 2.  **Clone Your Fork:**
 
     ```
-    git clone https://github.com/your-username/mindmap-app.git
-    cd mindmap-app
+    git clone https://github.com/anpinghuang/MindNoodle.git
+    cd MindNoodle
 
     ```
 
