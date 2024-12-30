@@ -4,7 +4,7 @@ MindNoodle Documentation
 Table of Contents
 -----------------
 
-1.  [Introduction](https://chatgpt.com/g/g-p-676706c735d08191b4a99762313f30e9-mind-map-software/c/676a2bfd-13ac-800e-8dac-1e573de8535f#introduction)
+1.  [Introduction](#introduction)
 2.  [Features](https://chatgpt.com/g/g-p-676706c735d08191b4a99762313f30e9-mind-map-software/c/676a2bfd-13ac-800e-8dac-1e573de8535f#features)
 3.  [Installation and Setup](https://chatgpt.com/g/g-p-676706c735d08191b4a99762313f30e9-mind-map-software/c/676a2bfd-13ac-800e-8dac-1e573de8535f#installation-and-setup)
 4.  [Usage Guide](https://chatgpt.com/g/g-p-676706c735d08191b4a99762313f30e9-mind-map-software/c/676a2bfd-13ac-800e-8dac-1e573de8535f#usage-guide)
