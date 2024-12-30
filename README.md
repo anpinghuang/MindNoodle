@@ -1,4 +1,4 @@
-Mindmap Application Comprehensive Documentation
+MindNoodle Documentation
 ===============================================
 
 Table of Contents
@@ -28,7 +28,7 @@ Table of Contents
 Introduction
 ------------
 
-Welcome to the **Mindmap Application** documentation. This desktop application is designed to help users create, edit, and manage mindmaps efficiently. Built using [Electron](https://www.electronjs.org/), it offers a seamless cross-platform experience with features such as drag-and-drop image integration, customizable settings, undo/redo functionalities, and more. Whether you're brainstorming ideas, planning projects, or organizing information, this application provides a user-friendly interface to visualize your thoughts effectively.
+Welcome to the **MindNoodle Software** documentation. This desktop application is designed to help users create, edit, and manage mindmaps efficiently. Built using [Electron](https://www.electronjs.org/), it offers a seamless cross-platform experience with features such as drag-and-drop image integration, customizable settings, undo/redo functionalities, and more. Whether you're brainstorming ideas, planning projects, or organizing information, this application provides a user-friendly interface to visualize your thoughts effectively.
 
 * * * * *
 
@@ -1038,12 +1038,3 @@ renderer.js
 4.  The node's content updates, and the textarea is removed.
 
 * * * * *
-
-Summary
--------
-
-The Mindmap Application seamlessly integrates frontend and backend functionalities to provide a robust tool for mindmap creation and management. By leveraging Electron's capabilities, the application ensures cross-platform compatibility, while libraries like AdmZip and Pickr enhance its feature set. The modular codebase, coupled with secure IPC practices, ensures maintainability and scalability for future enhancements.
-
-For any further inquiries or contributions, refer to the [Contributing](https://chatgpt.com/g/g-p-676706c735d08191b4a99762313f30e9-mind-map-software/c/676a2bfd-13ac-800e-8dac-1e573de8535f#contributing) section or reach out through the project's repository.
-
-Happy mapping!
