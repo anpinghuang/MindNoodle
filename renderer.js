@@ -710,6 +710,7 @@ function getEdgeCircles(node) {
 }
 
 function handlePointerDown(e) {
+    saveState();
     e.preventDefault(); // Prevent default behaviors
 
     // **1. Handle Image Resizing**
@@ -941,6 +942,7 @@ function handlePointerDown(e) {
             updateColorDisplay();
         }
     } else {
+        saveState();
         // **Deselect if clicking elsewhere**
         selectedNodes = [];
         selectedConnections = []; // Deselect any selected connections
